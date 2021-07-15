@@ -110,3 +110,105 @@ choice = random.choice(lunch_box)
 print("{0} 드세요".format(choice))
 ```
 
+
+
+# 07_15 파이썬 정리
+
+## 데이터 크롤링
+
+>웹페이지를 가져와서 데이터를 추출하는 방식
+>
+>ex) 네이버 금융 코스피 지수 추출하기
+
+```python
+import requests   # 데이터를 추출하기 위해 필요한 모듈
+from bs4 import BeautifulSoup  
+
+
+url = "https://finance.naver.com/sise/"
+
+response = requests.get(url).text
+# print(response)
+
+# 텍스트에서 정보를 추출
+data = BeautifulSoup(response)
+# 선택지를 활용해서 해당 위치를 찾는다
+kospy = data.select_one('#KOSPI_now')
+# 출력
+print(kospy.text)
+```
+
+
+
+ex2) 미국 환율정보 추출하기
+
+```python
+import requests
+from bs4 import BeautifulSoup
+
+
+url = 'https://finance.naver.com/marketindex/'
+
+response = requests.get(url).text
+# print(response)
+
+# 텍스트에서 정보를 추출
+data = BeautifulSoup(response, 'html.parser')
+# 선택지를 활용해서 해당 위치를 찾는다
+exchange_rate = data.select_one('#exchangeList > li > a.head.usd').text
+# 출력
+# f-string : 파이썬 3.6 이상에서만 동작
+print(f'달러 환율은 {exchange_rate} 입니다.')
+```
+
+
+
+## API 추출
+
+> API란? 크롤링이 웹페이지에서 데이터를 추출해오는 것이라면, API는 웹페이지를 그대로 받아와 데이터를 사용하는 개념이라고 할 수 있다.
+
+ex) age따오기
+
+```python
+import requests
+
+# 무식한 방식
+url = ["https://api.agify.io?name=tak",
+       "https://api.agify.io?name=tony",
+       "https://api.agify.io?name=eric",
+       "https://api.agify.io?name=musk"]
+
+response = [requests.get(url[0]).json(),
+            requests.get(url[1]).json(),
+            requests.get(url[2]).json(),
+            requests.get(url[3]).json()]
+for i in range(0, 4):
+    print(response[i]['age'])
+    
+# 세련된 방식
+names = ['tak', 'tony', 'tom', 'ann', 'eric', 'musk']
+for name in names:
+    url1 = f'https://api.agify.io?name={name}'
+    response = requests.get(url1)
+    result = response.json()
+    print(result['age'])
+
+```
+
+
+
+ex) 국가 따오기
+
+```python
+import requests
+
+names = ['michael', 'tom', 'henry', 'chris']
+for name in names:
+    url = f"https://api.nationalize.io?name={name}"
+    response = requests.get(url).json()
+    print(response['country'][0]['country_id'])
+
+```
+
+
+
